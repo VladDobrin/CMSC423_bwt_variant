@@ -32,19 +32,25 @@ This will create a `project4` directory with all code and data required for this
 Instructions on how to prepare your solution are given in
 [project code repository](https://gitlab.umiacs.umd.edu/hcorrada/cmsc423_project4).
 
-## SNV Finding ##
+## Variant Finding ##
 
 Use your code to analyze the provided sequencing reads from coronavirus strain 2019-nCoV/USA-IL1/2020, provided in `data/2019-nCoV.fa`.
-SNVs or Single Nucleotide Variants are ...
 
-Use your code  to analyze sequences for the [neuraminidase Influenza gene (NA)](http://en.wikipedia.org/wiki/Influenza_neuraminidase) of
-two H1N1 Human Influenza strains.
+SNVs or Single Nucleotide Variants are ...
 
 There are two FASTA files in directory `data` of the project repository. The `reference.fa` file contains a reference sequence you will use as the target string for approximate exact matching. The `reads.fa` file contains 50 bp reads you will use as queries. Use your approximate matching BWT solution to align reads to reference allowing up to 3 mismatches.
 
-**Question 1**. A specific mutation (H275Y) in the NA gene confers resistance to [Oseltamivir](http://en.wikipedia.org/wiki/Neuraminidase_inhibitors), making
-the drug [less effective](http://www.ncbi.nlm.nih.gov/pubmed/22837199). A note about nomenclature: the code H275Y
-encodes a substitution in position 275 (1-based indexing), changing aminoacid H (Histidine) to Y (Tyrosine).
+Simplifications for the data provided in this project:
+
+  * Often, reads will be drawn (approximately equally) from both the forward and reverse complement strands of
+  the underlying (c)DNA.  However, to simplify the read alignment problem for this project, the reads are 
+  _all drawn from the forward strand_.  That means that instead of having to consider aligning both the provided 
+  sequence of each read as well as that read's reverse complement (or, instead of having to index both the index
+  and the reverse complement of the index), you can simply index the reference in the provided orientation and 
+  you can assume that each read will align in its provided orientation.
+
+
+**Question**. The provided reads are drawn from a strain of the 
 
 Do the reads correspond to a gene sequence with this mutation? How can you tell?
 
