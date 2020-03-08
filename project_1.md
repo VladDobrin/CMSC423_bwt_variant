@@ -70,7 +70,64 @@ Simplifications for the data provided in this project:
 
 ### Your tool ###
 
-You should implement a tool, called `fmmap`, 
+You should implement a tool named `fmmap` (for FM-index mapper).  The `fmmap` tool should have two commands:
+
+The first command is called `index`, and it takes 2 arguments.  The first argument is the path to a FASTA
+format file and the second is the location of an output file where the index will be written.  When invoked
+in this mode, `fmmap` will read the input file and will compute the FM-index of the corresponding string.
+In this case, the index should consist of:
+
+  1. The name and length of the input sequence (which is referred to below as S)
+  2. An efficient representation of the first column of BWM(S)
+  3. The last column of BWM(S)
+  4. The occ table (can be sampled if you want, but it need not be) for the characters 'A', 'C', 'G', and 'T'
+  5. The suffix array (can be sampled if you want, but it need not be) of S
+  
+together, these components will allow you to perform efficient backward search in over S for seed finding.
+It is highly recommened you write your index down in a _binary_ format. This will make writing and reading 
+it more efficient.  Importantly, it will also let you think about how actual tools might pack multiple different
+components for their indices into a file.
+
+The index command should be executed as follows:
+
+~~~bash
+$ fmmap index reference.fa ref_index
+~~~
+
+This will index `reference.fa` and write the output index, with the components described above, to `output_index`.  **While you are free to implement the indexing procedure however you want**, I would recommend building the suffix array first, then using that to read off the BWT(S), from which you can derive the first column of BWM(S), and the occ table for all characters in linear time.
+
+The second command that `fmmap` should implement is a command called `align`.  This command should be executed as such:
+
+~~~bash
+$ fmmap align ref_index reads.fq alignments.sam
+~~~
+
+This command takes 3 arguments, the first is the index built by `fmmap index`, the second is a FASTQ format file 
+containing the read sequences, and the third is the output file where the alignments for the reads are to be written.
+
+
+**How should my mapping algorithm work?** We are providing you with some freedom to explore the space of algorithms / heuristics if you wish.  However, here is a somewhat naive (but acceptable) basic algorithm for determining the alignments for each read in pseudocode:
+
+~~~python
+
+ninf = float("-inf")
+for name, seq, qual in readfq(readfile):
+    alignments = []
+    last_index = len(seq)-1
+    read_len = len(seq)
+    best_score = ninf
+    while last_index > 0:
+    	interval, last_index = bwt_index.get_interval(seq[:last_index])
+	for ref_pos in bwt_index.ref_positions(interval, last_index):
+	    alignment = fitting_alignment(seq, reference[ref_pos - gap: ref_pos + read_len + gap])
+	    if alignment.score > best_score:
+	    	best_score = alignment.score
+		alignments = [alignment]
+	    elif alignment.score == best_score:
+	        alignments.append(alignment)
+~~~
+
+
 
 **Question**. The provided reads are drawn from a strain of the coronavirus; your goal is to determine _what variants_ this strain has with respect to the reference genome with which you are provided (in `data/2019-nCoV.fa`).
 
