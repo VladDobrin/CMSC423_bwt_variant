@@ -111,20 +111,44 @@ containing the read sequences, and the third is the output file where the alignm
 ~~~python
 
 ninf = float("-inf")
+seed_skip = lambda l: math.floor(l / 5.0)
+gap = 5
+
 for name, seq, qual in readfq(readfile):
     alignments = []
     last_index = len(seq)-1
     read_len = len(seq)
     best_score = ninf
-    while last_index > 0:
-    	interval, last_index = bwt_index.get_interval(seq[:last_index])
-	for ref_pos in bwt_index.ref_positions(interval, last_index):
-	    alignment = fitting_alignment(seq, reference[ref_pos - gap: ref_pos + read_len + gap])
+    seed_pos = 0
+    skip = seed_skip(read_len)
+    for seed_start in range(0, read_len, skip):
+    	seed_end = min(read_len, seed_start + skip) 
+    	##
+	# get_interval takes a string and performs backward search until 
+	# either (1) the entire string is matched or (2) the search interval
+	# becomes empty.  The second return value, match_len, is the length of
+	# the query matched in backward search.  If the interval is non-empty
+	# then this is just equal to `skip` above.
+	##
+    	interval, match_len = bwt_index.get_interval(seq[seed_start:seed_end])
+	
+	# given all the places where the seed matches, look for an alignment around it
+	# the ref_positions member of `bwt_index` will return positions on the reference 
+	# string corresponding to the *beginning of the read*, assuming there are no gaps
+	# in the alignment before the start of the seed (handling that is why we do fitting 
+	# alignment below).
+	for ref_pos in bwt_index.ref_positions(interval, seed_end, match_len):
+	    # Perform a "fitting" alignment of the query (seq) into the reference (ref)
+	    # the returned alignment object contains the score, the alignment and the 
+	    # implied position where the query (seq) begins under the alignment
+	    alignment = fitting_alignment(seq, ref, ref_pos, gap)
 	    if alignment.score > best_score:
 	    	best_score = alignment.score
 		alignments = [alignment]
 	    elif alignment.score == best_score:
 	        alignments.append(alignment)
+    for a in alignments:
+        write_to_sam(output_file, a)
 ~~~
 
 
