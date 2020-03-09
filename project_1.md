@@ -34,13 +34,11 @@ The basic variant detection procedure is as follows.  You will build a tool to a
 You are provided with a _reference genome_ for a particular strain of the coronavirus (2019-nCoV/USA-IL1/2020).
 This genome is a single "contig" (a single fasta file entry) and is provided in `data/2019-nCoV.fa`.  *NOTE*: This is the _real_ sequence for this strain of the coronavirus (cool, huh?).
 
-Additionally, you are provided with a set of _single-end_ sequencing reads.  There are 1,000,000 reads, each of length 100 nucleotides / base pairs (100bp).  They have been simulated from a _variant strain_ of the coronavirus that has a small number of variations (both point mutations and small insertions and deletions) with respect to the reference strain provided in `data/2019-nCoV.fa`.
+Additionally, you are provided with a set of _single-end_ sequencing reads in the file `data/reads.fa.gz`.  These reads are gzipped to save space; you can either unzip them or use a library for reading the data that reads directly from a gzipped file.  There are 1,000,000 reads, each of length 100 nucleotides / base pairs (100bp).  They have been simulated from a _variant strain_ of the coronavirus that has a small number of variations (both point mutations and small insertions and deletions) with respect to the reference strain provided in `data/2019-nCoV.fa`.
 
 ### Your goal ###
 
 **Your task is to write a basic read alignment tool, based on the seed-and-extend or seed-and-vote paradigm (whichever you prefer) using the FM-index for efficient seed finding**.
-
-Your tool should have 
 
 Simplifications for the data provided in this project:
 
@@ -164,6 +162,10 @@ As an alternative to samtools, the above can also be done with the Picard tools 
 Now, you have both the original genome `2019-nCoV.fa` and the sorted BAM file with your alignments `mapping_sorted.bam`. 
 Open up IGV, and load the genome.  You can do this through the main menu by *Genomes* -> *Load Genome From File*, and pointing it at `2019-nCoV.fa`.  Then, you can load your alignments using *File* -> *Load from File*, and pointing it at `mapping_sorted.bam`.  IGV will load the file and you can now explore the visualization.  Detailed instructions on how to navigate your alignments using IGV can be found [here](https://software.broadinstitute.org/software/igv/AlignmentData).  **You can use IGV to interactively navigate the pileup and locate the variants**.
 
+### Hints ###
+
+The reads encode *8* variants with respect to the reference strain.  So, you should be looking to find *8* total differences between the reference strain and your reads.  Moreover, exactly *4* of these variants are single nucleotide variants (SNVs) (i.e. point mutations where a base in the reference is replaced by a different base in the sample).  The other *4* are small insertions or deletions from the reference strain (to keep things simple, all of the indels are <= 5 base pairs in length).
+
 ## Deliverables ##
 
 Your deliverable consists of a tarball containing:
@@ -175,6 +177,7 @@ Your deliverable consists of a tarball containing:
     
       * Discovered variants : what variants did you discover?  What is the evidence you found for these 
       variants?  You are encouraged to include e.g. screenshots from IGV showing your pileups in the variant regions.
+      Specifically, **for each variant, what is the position (with respect to the original reference) at which it occurs, and what is the nature of the variant / edit?**. Is it a substitution, an insertion, or a deletion.  If it is a substitution, what reference base is substituted for what variant base?  If it is a deletion, which bases are deleted?  If it is an insertion, what bases are inserted?
       
       * Design : what specific design decisions did you make in your tool, and why?  If you were going to start the 
         project again from scratch, what, if anything, would you do differently?
