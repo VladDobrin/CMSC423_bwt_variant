@@ -116,7 +116,6 @@ gap = 5
 
 for name, seq, qual in readfq(readfile):
     alignments = []
-    last_index = len(seq)-1
     read_len = len(seq)
     best_score = ninf
     seed_pos = 0
@@ -151,7 +150,7 @@ for name, seq, qual in readfq(readfile):
         write_to_sam(output_file, a)
 ~~~
 
-
+Of course, there are all kinds of heuristics you can use to speed things up.  For example, if you have already determined that a read should align to a specific reference position, then there is no use aligning the read to that position again (due to another seed), so you could keep the list of aligned positions in a hash table for each read to avoid redundant work.  Likewise, if a read maps end-to-end with no edits, then there can be no better alignment, and you must have found all equally-best alignments, so you can skip lookup for the rest of the seeds of that read etc.  You are not required to implement such heuristics, but you are encouraged to try them out (and write about them in the report).
 
 **Question**. The provided reads are drawn from a strain of the coronavirus; your goal is to determine _what variants_ this strain has with respect to the reference genome with which you are provided (in `data/2019-nCoV.fa`).
 
