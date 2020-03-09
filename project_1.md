@@ -1,36 +1,20 @@
 ---
 date: 2020-03-07
-title: "Project 1: SNV detection using the BWT"
+title: "Project 1: Variant detection using the FM-index"
 ---
 
 **Due: Mon March 30, 2020**  
 **Posted: March 9, 2020**  
-**ZZZ**  
+**Last updated: March 9, 2020**  
 
 **Note**: This assignment is based on a project developed by Héctor Corrada Bravo for a previous 
 iteration of the course.  However, it has been modified (in parts, substantially) for the current iteration of the course.
 
-You will implement approximate string matching using a seed-and-check / seed-and-extend strategy based on exact matching using the
-Burrows-Wheeler transform. 
+You will implement approximate string matching using a seed-and-check / seed-and-extend strategy based on exact matching using the FM-index, as well as a "fitting alignment" to build a basic read aligner. 
 
-We are providing starter code to get you going. Instructions on implementation and code are here:
+As you develop your proejct, I **highly, highly** recommend that you use [`git`](https://git-scm.com/book/en/v1/Getting-Started) for developing your code.
 
-[https://gitlab.umiacs.umd.edu/hcorrada/cmsc423_project4](https://gitlab.umiacs.umd.edu/hcorrada/cmsc423_project4)
-
-I **highly, highly** recommend that you use [`git`](https://git-scm.com/book/en/v1/Getting-Started) for developing your code.
-
-To get code you will be using for this project using git:
-
-~~~bash
-git clone https://gitlab.umiacs.umd.edu/hcorrada/cmsc423_project4.git
-~~~
-
-This will create a `project4` directory with all code and data required for this project.
-
-## Programming Questions ##
-
-Instructions on how to prepare your solution are given in
-[project code repository](https://gitlab.umiacs.umd.edu/hcorrada/cmsc423_project4).
+To get started, you can clone this repository, which contains a `data` sub-directory with the data that is described below that you will use for this project.
 
 ## Assignment ##
 
@@ -39,7 +23,7 @@ in a genome.
 
 ### The problem of variant finding ###
 
-The problem of using a sequenced sample to determine genomic variants with respect to some reference genome is common.  In reality, there are entire _pipelines_ focused around the challenges posed by variant detection from experimental data.  One of the big challenges includes potentially low sequencing coverage of the variant regions, which makes it difficult to distinguish a true variant from sequencing errors.
+The problem of using a sequenced sample to determine genomic variants with respect to some reference genome is common.  In reality, there are [entire _pipelines_](https://gatk.broadinstitute.org/hc/en-us) focused around the challenges posed by variant detection from experimental data.  One of the big challenges includes potentially low sequencing coverage of the variant regions, which makes it difficult to distinguish a true variant from sequencing errors.
 
 However, for the purposes of this assignment, our focus is on implementing the concepts we've built up in class, and so we've made the actual variant detection problem easy by (1) providing _very high_ coverage of the target genome so that the detection of variants is easier (2) limiting the size of variants to be very small, which makes them easier to detect and (3) giving you extra information (the number of variants).
 
@@ -104,7 +88,7 @@ $ fmmap align ref_index reads.fq alignments.sam
 
 This command takes 3 arguments, the first is the index built by `fmmap index`, the second is a FASTQ format file 
 containing the read sequences, and the third is the output file where the alignments for the reads are to be written.
-
+The reads are to be written in SAM format, for which the specification is [here](https://samtools.github.io/hts-specs/SAMtags.pdf).  **NOTE**: You should immediately take some time to familiarize yourself with the SAM format.  It is the _lingua franca_ of read alignments in genomics, but it is not the most intuitive thing in the world.  For this project, we are trying to keep things as simple as possible by dealing only with single-end reads, most of which should map in only one location.  Nonetheless, your program should needs to write a _valid_ SAM file; otherwise, the steps described below for converting your output to BAM format, sorting and indexing it, and loading it into IGV will not work.  Specifically, when you perform alignment using your "fitting alignment" function, you will have to convert the alignment string into the CIGAR format that is used by SAM to encode alignments.  The format is not difficult, but you should write and thorougly test the functions for converting the backtrace from your alignment to a CIGAR string.
 
 **How should my mapping algorithm work?** We are providing you with some freedom to explore the space of algorithms / heuristics if you wish.  However, here is a somewhat naive (but acceptable) basic algorithm for determining the alignments for each read in pseudocode:
 
@@ -152,7 +136,7 @@ for name, seq, qual in readfq(readfile):
 
 Of course, there are all kinds of heuristics you can use to speed things up.  For example, if you have already determined that a read should align to a specific reference position, then there is no use aligning the read to that position again (due to another seed), so you could keep the list of aligned positions in a hash table for each read to avoid redundant work.  Likewise, if a read maps end-to-end with no edits, then there can be no better alignment, and you must have found all equally-best alignments, so you can skip lookup for the rest of the seeds of that read etc.  You are not required to implement such heuristics, but you are encouraged to try them out (and write about them in the report).
 
-**Question**. The provided reads are drawn from a strain of the coronavirus; your goal is to determine _what variants_ this strain has with respect to the reference genome with which you are provided (in `data/2019-nCoV.fa`).
+**Question**. The provided reads are drawn from a strain of the coronavirus; your goal is to determine _what variants_ this strain has with respect to the reference genome with which you are provided (in `data/2019-nCoV.fa`)?
 
 **How to look for variants:** To look for variants, I _highly_ suggest you use the Integrative Genomics Viewer (IGV), which you can get for all platforms [here](https://software.broadinstitute.org/software/igv/download).  This is a tool to let you visualize the pileup of alignments on the genome and determine what the relevant variants are.  To load the SAM file generated by your program into IGV, you first need to sort and index the file.  The easiest way to do this is with [samtools](http://www.htslib.org/download/).
 
