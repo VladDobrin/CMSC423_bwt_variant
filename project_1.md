@@ -121,7 +121,13 @@ for name, seq, qual in readfq(readfile):
 	for ref_pos in bwt_index.ref_positions(interval, seed_end, match_len):
 	    # Perform a "fitting" alignment of the query (seq) into the reference (ref)
 	    # the returned alignment object contains the score, the alignment and the 
-	    # implied position where the query (seq) begins under the alignment
+	    # implied position where the query (seq) begins under the alignment.
+	    # To perform the fitting alignment, you should "slice out" a region of the 
+	    # reference around the implied start position (ref_pos) with a bit of padding
+	    # (e.g. gap bases) before the first base where the read would start and after
+	    # the last base where the read would end.  This will ensure that the fitting_alignment
+	    # procedure can find the optimal position for the query within the reference
+	    # window that contains it, even if there are insertions or deletions in the read.
 	    alignment = fitting_alignment(seq, ref, ref_pos, gap)
 	    if alignment.score > best_score:
 	    	best_score = alignment.score
