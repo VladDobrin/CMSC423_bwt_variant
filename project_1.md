@@ -14,7 +14,7 @@ You will implement approximate string matching using a seed-and-check / seed-and
 
 As you develop your proejct, I **highly, highly** recommend that you use [`git`](https://git-scm.com/book/en/v1/Getting-Started) for developing your code.
 
-To get started, you can clone this repository, which contains a `data` sub-directory with the data that is described below that you will use for this project.
+To get started, you can clone [this](https://github.com/rob-p/CMSC423_bwt_variant) repository, which contains a `data` sub-directory with the data that is described below that you will use for this project.
 
 ## Assignment ##
 
