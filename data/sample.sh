@@ -9,7 +9,7 @@ bowtie2-build 2019-nCoV.fa 2019-nCoV_bt2_idx
 ## align with bowtie2 (note, it uses an *affine* gap penalty, which you are not required to implement)
 ## so the alignments you get may not all be identical to those returned by Bowtie2, but your alignments should
 ## be optimal under your scoring function
-bowtie2 --rdg 2,2 --rfg 2,2 --mp 2 -x 2019-nCoV_bt2_idx -f -U reads_s1000.fa -S mapped_s1000.sam
+bowtie2 --rdg 0,2 --rfg 0,2 --mp 2 -x 2019-nCoV_bt2_idx -f -U reads_s1000.fa -S mapped_s1000.sam
 
 ## convert to bam (if we want)
 samtools view -b -o mapped_s1000.bam mapped_s1000.sam
